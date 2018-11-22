@@ -1,4 +1,4 @@
-pragma solidity ^0.4.2;
+pragma solidity ^"0.4.20";
 
 contract Election {
     // Model a Candidate
@@ -10,12 +10,18 @@ contract Election {
 
     // Store accounts that have voted
     mapping(address => bool) public voters;
-    // Read/write candidates
+    // Store Candidates
+    // Fetch Candidate
     mapping(uint => Candidate) public candidates;
     // Store Candidates Count
     uint public candidatesCount;
 
-    constructor() Election () public {
+    // voted event
+    event votedEvent (
+        uint indexed _candidateId
+    );
+
+    function Election () public {
         addCandidate("Candidate 1");
         addCandidate("Candidate 2");
     }
@@ -27,15 +33,18 @@ contract Election {
 
     function vote (uint _candidateId) public {
         // require that they haven't voted before
-        require(!voters[msg.sender],"error with requirement");
+        require(!voters[msg.sender]);
 
         // require a valid candidate
-        require(_candidateId > 0 && _candidateId <= candidatesCount,"Error: Not a valid Candidate");
+        require(_candidateId > 0 && _candidateId <= candidatesCount);
 
         // record that voter has voted
         voters[msg.sender] = true;
 
         // update candidate vote Count
         candidates[_candidateId].voteCount ++;
+
+        // trigger voted event
+        votedEvent(_candidateId);
     }
 }
